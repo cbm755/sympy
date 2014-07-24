@@ -364,21 +364,30 @@ def test_EqualityNonEval_solvers():
            nsolve((e1n, e2n), (x, y), (-1, 1))
 
 
-def test_EqualityNonEval_solvers_no_soln():
+def test_EqualityNonEval_solvers_xeqx():
     from sympy import solve, solve_linear
-    # should not be empty
-    en = Eqn(x-1, x-2)
-    soln = solve(en, x)
-    assert not soln
-
-# @XFAIL
-def test_EqualityNonEval_solvers_cancellation():
-    from sympy import solve, solve_linear
-    # should not be empty
+    # should be the empty list
     en = Eqn(x, x)
     soln = solve(en, x)
-    assert soln
+    assert soln == []
+    assert soln not in [S.false, False]
+    # why is this good output?  Consider:
+    x2 = Symbol('x', positive=True)
+    soln = solve(Eq(x2, -4), x2)
+    assert soln == []
+    assert soln not in [S.false, False]
 
+
+@XFAIL  # mark or not?
+def test_EqualityNonEval_solvers_no_soln():
+    from sympy import solve, solve_linear
+    # should be False not empty?
+    en = Eqn(x, x-1)
+    soln = solve(en, x)
+    assert soln in [S.false, False]
+    assert not soln == []
+
+@XFAIL  # mark or not?
 def test_EqualityNonEval_solve_linear():
     # even worse than above, this gives tuple (0,1)
     from sympy import solve_linear
@@ -387,6 +396,7 @@ def test_EqualityNonEval_solve_linear():
     assert soln
     assert not soln == (0, 1)  # fails
 
+@XFAIL  # mark or not?
 def test_EqualityNonEval_solve_linear2():
     # just errors out, excepting no soln
     from sympy import solve_linear
