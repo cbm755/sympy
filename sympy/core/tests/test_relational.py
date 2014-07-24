@@ -362,3 +362,34 @@ def test_EqualityNonEval_solvers():
     # equality---on a determininistic platform anyway :-)
     assert nsolve((e1, e2),   (x, y), (-1, 1)) == \
            nsolve((e1n, e2n), (x, y), (-1, 1))
+
+
+def test_EqualityNonEval_solvers_no_soln():
+    from sympy import solve, solve_linear
+    # should not be empty
+    en = Eqn(x-1, x-2)
+    soln = solve(en, x)
+    assert not soln
+
+# @XFAIL
+def test_EqualityNonEval_solvers_cancellation():
+    from sympy import solve, solve_linear
+    # should not be empty
+    en = Eqn(x, x)
+    soln = solve(en, x)
+    assert soln
+
+def test_EqualityNonEval_solve_linear():
+    # even worse than above, this gives tuple (0,1)
+    from sympy import solve_linear
+    en = Eqn(x, x)
+    soln = solve_linear(en, S(0), symbols=x)
+    assert soln
+    assert not soln == (0, 1)  # fails
+
+def test_EqualityNonEval_solve_linear2():
+    # just errors out, excepting no soln
+    from sympy import solve_linear
+    en = Eqn(x-1, x-2)
+    soln = solve_linear(en, S(0), symbols=x)
+    assert not soln
