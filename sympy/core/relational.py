@@ -185,11 +185,7 @@ class Equality(Relational):
 
     is_Equality = True
 
-    def __new__(cls, lhs, rhs=0, **kwargs):
-        doeval = kwargs.pop('evaluate', True)
-        assumptions = kwargs;
-        if not doeval:
-            return EqualityNonEval(lhs, rhs, **assumptions)
+    def __new__(cls, lhs, rhs=0, **assumptions):
         lhs = _sympify(lhs)
         rhs = _sympify(rhs)
         # If one expression has an _eval_Eq, return its results.
