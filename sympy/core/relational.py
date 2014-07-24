@@ -190,8 +190,6 @@ class Equality(Relational):
         assumptions = kwargs;
         if not doeval:
             return EqualityNonEval(lhs, rhs, **assumptions)
-            # alternatively, still give an `Equality`:
-            #return Relational.__new__(cls, lhs, rhs, **assumptions)
         lhs = _sympify(lhs)
         rhs = _sympify(rhs)
         # If one expression has an _eval_Eq, return its results.
