@@ -218,12 +218,11 @@ class Equality(Relational):
 Eq = Equality
 
 
-class EqualityNonEval(Relational):
+class EqualityNonEval(Equality):
     """An equal relation between two objects.
 
-    Represents that two objects are equal.  The relation is not reduced.
-
-    FIXME:
+    Represents that two objects are equal.  The relation is not
+    reduced like it is with `Equality`.
 
     Examples
     ========
@@ -237,14 +236,15 @@ class EqualityNonEval(Relational):
 
     See Also
     ========
-    sympy.core.relational.Eq : reducing version.
+    sympy.core.relational.Equality : reducing version.
 
     Notes
     =====
     This class is not the same as the == operator.  The == operator tests
     for exact structural equality between two expressions; this class
-    compares expressions mathematically.  Nor is it the same as the
-    `Eq` method, which tries to reduce to True or False if possible.
+    represents mathematical equality between two expressions.  Nor is
+    it the same as the `Eq` method, which tries to reduce to True or
+    False if possible.
 
     If either object defines an `_eval_Eqn` method, it can be used in
     place of the default algorithm.  If `lhs._eval_Eqn(rhs)` or
