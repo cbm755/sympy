@@ -3,7 +3,7 @@ from sympy import (S, Symbol, symbols, oo, I, pi, Float, And, Or, Not, Implies,
     Xor)
 from sympy.core.relational import ( Relational, Equality, Unequality,
     GreaterThan, LessThan, StrictGreaterThan, StrictLessThan, Rel, Eq, Lt, Le,
-    Gt, Ge, Ne )
+    Gt, Ge, Ne, EqualityNonEval, Eqn )
 from sympy.sets.sets import Interval, FiniteSet
 
 x, y, z, t = symbols('x,y,z,t')
@@ -313,3 +313,52 @@ def test_Not():
     assert Not(StrictLessThan(x, y)) == GreaterThan(x, y)
     assert Not(GreaterThan(x, y)) == StrictLessThan(x, y)
     assert Not(LessThan(x, y)) == StrictGreaterThan(x, y)
+
+
+def test_EqualityNonEval_really_noneval():
+    en = Eqn(x,x)
+    assert en not in [S.true, S.false, True, False]
+    assert en.doit() not in [S.true, S.false, True, False]
+    en = Eqn(S(5),S(2))
+    assert en not in [S.true, S.false, True, False]
+    assert en.doit() not in [S.true, S.false, True, False]
+
+
+def test_EqualityNonEval_solvers():
+    # FIXME: move to solvers tests?
+    from sympy import (solve, solve_linear, solve_undetermined_coeffs,
+        nsolve)
+    a, b = symbols('a, b')
+
+    e = Eq(x,9)
+    en = Eqn(x,9)
+    assert solve(e,x) == solve(en,x)
+
+    e = Eq(x*x,9*x)
+    en = Eqn(x*x,9*x)
+    assert solve(e,x) == solve(en,x)
+
+    e = Eq(x+y,0)
+    en = Eqn(x+y,0)
+    assert (solve_linear(e)) == (solve_linear(en))
+
+    e = Eq(x,0)
+    en = Eqn(x,0)
+    assert (solve_linear(e)) == (solve_linear(en))
+
+    e = Eq(2*a*x + a+b, x)
+    en = Eqn(2*a*x + a+b, x)
+    assert (solve_undetermined_coeffs(e, [a, b], x)) == \
+        (solve_undetermined_coeffs(en, [a, b], x))
+
+    f1 = 3 * x**2 - 2 * y**2 - 1
+    f2 = x**2 - 2 * x + y**2 + 2 * y - 8
+    e1 = Eq(f1, 0)
+    e2 = Eq(f2, 0)
+    e1n = Eqn(f1, 0)
+    e2n = Eqn(f2, 0)
+    # this is a floating point equality test but they should really do
+    # exactly the same thing, so reasonable to expect exact
+    # equality---on a determininistic platform anyway :-)
+    assert (nsolve((e1, e2), (x, y), (-1, 1))) == \
+        (nsolve((e1n, e2n), (x, y), (-1, 1)))
