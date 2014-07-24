@@ -330,26 +330,26 @@ def test_EqualityNonEval_solvers():
         nsolve)
     a, b = symbols('a, b')
 
-    e = Eq(x,9)
-    en = Eqn(x,9)
-    assert solve(e,x) == solve(en,x)
+    e = Eq(x, 9)
+    en = Eqn(x, 9)
+    assert solve(e, x) == solve(en, x)
 
-    e = Eq(x*x,9*x)
-    en = Eqn(x*x,9*x)
-    assert solve(e,x) == solve(en,x)
+    e = Eq(x*x, 9*x)
+    en = Eqn(x*x, 9*x)
+    assert solve(e, x) == solve(en, x)
 
-    e = Eq(x+y,0)
-    en = Eqn(x+y,0)
-    assert (solve_linear(e)) == (solve_linear(en))
+    e = Eq(x+y, 0)
+    en = Eqn(x+y, 0)
+    assert solve_linear(e) == solve_linear(en)
 
-    e = Eq(x,0)
-    en = Eqn(x,0)
-    assert (solve_linear(e)) == (solve_linear(en))
+    e = Eq(x, 0)
+    en = Eqn(x, 0)
+    assert solve_linear(e) == solve_linear(en)
 
     e = Eq(2*a*x + a+b, x)
     en = Eqn(2*a*x + a+b, x)
-    assert (solve_undetermined_coeffs(e, [a, b], x)) == \
-        (solve_undetermined_coeffs(en, [a, b], x))
+    assert solve_undetermined_coeffs(e,  [a, b], x) == \
+           solve_undetermined_coeffs(en, [a, b], x)
 
     f1 = 3 * x**2 - 2 * y**2 - 1
     f2 = x**2 - 2 * x + y**2 + 2 * y - 8
@@ -360,5 +360,5 @@ def test_EqualityNonEval_solvers():
     # this is a floating point equality test but they should really do
     # exactly the same thing, so reasonable to expect exact
     # equality---on a determininistic platform anyway :-)
-    assert (nsolve((e1, e2), (x, y), (-1, 1))) == \
-        (nsolve((e1n, e2n), (x, y), (-1, 1)))
+    assert nsolve((e1, e2),   (x, y), (-1, 1)) == \
+           nsolve((e1n, e2n), (x, y), (-1, 1))
