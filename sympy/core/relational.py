@@ -12,6 +12,7 @@ __all__ = (
     'Rel', 'Eq', 'Ne', 'Lt', 'Le', 'Gt', 'Ge',
     'Relational', 'Equality', 'Unequality', 'StrictLessThan', 'LessThan',
     'StrictGreaterThan', 'GreaterThan',
+    'EqualityNonEval', 'Eqn',
 )
 
 
@@ -215,6 +216,69 @@ class Equality(Relational):
         return _sympify(lhs == rhs)
 
 Eq = Equality
+
+
+class EqualityNonEval(Relational):
+    """An equal relation between two objects.
+
+    Represents that two objects are equal.  The relation is not reduced.
+
+    FIXME:
+
+    Examples
+    ========
+
+    >>> from sympy import Eqn
+    >>> from sympy.abc import x, y
+    >>> Eqn(y, x+x**2)
+    y == x**2 + x
+    >>> Eqn(x, x)
+    x == x
+
+    See Also
+    ========
+    sympy.core.relational.Eq : reducing version.
+
+    Notes
+    =====
+    This class is not the same as the == operator.  The == operator tests
+    for exact structural equality between two expressions; this class
+    compares expressions mathematically.  Nor is it the same as the
+    `Eq` method, which tries to reduce to True or False if possible.
+
+    If either object defines an `_eval_Eqn` method, it can be used in
+    place of the default algorithm.  If `lhs._eval_Eqn(rhs)` or
+    `rhs._eval_Eqn(lhs)` returns anything other than None, that return
+    value will be substituted for the EqualityNonEval.  If None is
+    returned by `_eval_Eqn`, an EqualityNonEval object will be created
+    as usual.
+
+    """
+    rel_op = '=='
+
+    __slots__ = []
+
+    is_EqualityNonEval = True
+
+    def __new__(cls, lhs, rhs=0, **assumptions):
+        lhs = _sympify(lhs)
+        rhs = _sympify(rhs)
+        # If one expression has an _eval_Eqn, return its results.
+        if hasattr(lhs, '_eval_Eqn'):
+            r = lhs._eval_Eqn(rhs)
+            if r is not None:
+                return r
+        if hasattr(rhs, '_eval_Eqn'):
+            r = rhs._eval_Eqn(lhs)
+            if r is not None:
+                return r
+        return Relational.__new__(cls, lhs, rhs, **assumptions)
+
+    @classmethod
+    def _eval_relation(cls, lhs, rhs):
+        return _sympify(lhs == rhs)
+
+Eqn = EqualityNonEval
 
 
 class Unequality(Relational):

@@ -15,7 +15,7 @@ from .add import Add
 from .mod import Mod
 from .relational import ( Rel, Eq, Ne, Lt, Le, Gt, Ge,
     Equality, GreaterThan, LessThan, Unequality, StrictGreaterThan,
-    StrictLessThan )
+    StrictLessThan, EqualityNonEval, Eqn, )
 from .multidimensional import vectorize
 from .function import Lambda, WildFunction, Derivative, diff, FunctionClass, \
     Function, Subs, expand, PoleError, count_ops, \
