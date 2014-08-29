@@ -157,13 +157,7 @@ class OctaveCodePrinter(CodePrinter):
         return 'NaN'
 
     def _print_list(self, expr):
-        # FIXME: calling either self.doprint or CodePrinter.doprint
-        # sets self._not_supported and then clears it.  So you can't
-        # call doprint recursively like this?  But there must be some
-        # downside to bypassing self.doprint!
-        # FIXME: better to fix CodePrinter.doprint to allow recursive calls?
-        return '{' + ', '.join(StrPrinter.doprint(self,a) for a in expr) + '}'
-        #return '{' + ', '.join(self.doprint(a) for a in expr) + '}'
+        return '{' + ', '.join(self._print(a) for a in expr) + '}'
     _print_tuple = _print_list
     _print_Tuple = _print_list
 
