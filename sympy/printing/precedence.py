@@ -36,6 +36,7 @@ PRECEDENCE_VALUES = {
     "NegativeInfinity": PRECEDENCE["Add"],
     "MatAdd": PRECEDENCE["Add"],
     "MatMul": PRECEDENCE["Mul"],
+    "MatPow": PRECEDENCE["Pow"],
     "HadamardProduct": PRECEDENCE["Mul"]
 }
 
