@@ -1,10 +1,10 @@
 from sympy.core import (S, pi, oo, symbols, Function,
-                        Rational, Integer, Tuple)
+                        Rational, Integer, Tuple, Symbol)
 from sympy.core import EulerGamma, GoldenRatio, Catalan, Lambda
 from sympy.functions import Piecewise, sqrt, Abs, ceiling, exp, sin, cos
 from sympy.utilities.pytest import raises
 from sympy.utilities.lambdify import implemented_function
-from sympy.matrices import eye, Matrix
+from sympy.matrices import eye, Matrix, MatrixSymbol, Identity
 from sympy.integrals import Integral
 from sympy.concrete import Sum
 from sympy.utilities.pytest import XFAIL
@@ -102,6 +102,24 @@ def test_Matrices():
     assert mcode(Matrix(0, 3, [])) == 'zeros(0, 3)'
     # annoying to read but correct
     assert mcode(Matrix([[x, x - y, -y]])) == "[x x - y -y]"
+
+
+def test_MatrixSymbol():
+    n = Symbol('n', integer=True)
+    A = MatrixSymbol('A', n, n)
+    B = MatrixSymbol('B', n, n)
+    assert mcode(A*B) == "A*B"
+    assert mcode(B*A) == "B*A"
+    assert mcode(2*A*B) == "2*A*B"
+    assert mcode(B*2*A) == "2*B*A"
+    assert mcode(A*(B + 3*Identity(n))) == "A*(3*eye(n) + B)"
+    assert mcode(A**(x**2)) == "A^(x.^2)"
+    assert mcode(A**3) == "A^3"
+    assert mcode(A**(S.Half)) == "A^(1/2)"
+
+
+def test_special_matrices():
+    assert mcode(6*Identity(3)) == "6*eye(3)"
 
 
 def test_containers():
