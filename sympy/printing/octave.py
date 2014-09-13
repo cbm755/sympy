@@ -254,9 +254,10 @@ class OctaveCodePrinter(CodePrinter):
         elif (A.rows, A.cols) == (1, 1):
             # Octave does not distinguish between scalars and 1x1 matrices
             return self._print(A[0, 0])
-        elif A.rows == 1 :
+        elif A.rows == 1:
             return "[%s]" % A.table(self, rowstart='', rowend='', colsep=' ')
-        elif A.cols == 1 :
+        elif A.cols == 1:
+            # FIXME: not ideal, makes each equispaced
             return "[%s]" % A.table(self, rowstart='', rowend='',
                                     rowsep='; ', colsep=' ')
         return "[%s]" % A.table(self, rowstart='', rowend='',
@@ -325,6 +326,7 @@ class OctaveCodePrinter(CodePrinter):
         inc_token = ('if ', 'function ', 'else', 'elseif ')
         dec_token = ('end')
 
+        # pre-strip left-space from the code
         code = [ line.lstrip(' \t') for line in code ]
 
         increase = [ int(any(map(line.startswith, inc_token)))
