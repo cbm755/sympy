@@ -2,7 +2,7 @@ from sympy.core import S, symbols, Eq, pi, Catalan, Lambda, Dummy
 from sympy.core.compatibility import StringIO
 from sympy import erf, Integral, Piecewise
 from sympy import Equality
-from sympy.matrices import Matrix
+from sympy.matrices import Matrix, MatrixSymbol
 from sympy.printing.codeprinter import Assignment
 from sympy.utilities.codegen import (CCodeGen, Routine,
                                      InputArgument, CodeGenError,
@@ -1415,6 +1415,56 @@ def test_m_filename_match_first_fcn():
     name_expr = [ ("foo", [2*x, 3*y]), ("bar", [y**2, 4*y]) ]
     raises(NameError, lambda: codegen(name_expr,
                         "Octave", "bar", header=False, empty=False))
+
+
+def test_m_matrix_named():
+    # FIXME: myout1 should be MatrixSymbol?  Well maybe we want this to work too.
+    x, y, z = symbols('x,y,z')
+    e2 = Matrix([[x, 2*y, pi*z]])
+    name_expr = ("test", Equality(S('myout1'), e2, evaluate=False))
+    result = codegen(name_expr, "Octave", "test", header=False, empty=False)
+    assert result[0][0] == "test.m"
+    source = result[0][1]
+    expected = (
+        "function myout1 = test(x, y, z)\n"
+        "  myout1 = [x 2*y pi*z];\n"
+        "end\n"
+    )
+    assert source == expected
+
+
+@XFAIL
+def test_m_matrix_named_matsym():
+    # does component-by-component
+    x, y, z = symbols('x,y,z')
+    myout1 = MatrixSymbol('myout1', 1, 3)
+    e2 = Matrix([[x, 2*y, pi*z]])
+    name_expr = ("test", Equality(myout1, e2, evaluate=False))
+    result = codegen(name_expr, "Octave", "test", header=False, empty=False)
+    assert result[0][0] == "test.m"
+    source = result[0][1]
+    expected = (
+        "function myout1 = test(x, y, z)\n"
+        "  myout1 = [x 2*y pi*z];\n"
+        "end\n"
+    )
+    assert source == expected
+
+
+@XFAIL
+def test_m_matrix_output_autoname():
+    x, y, z = symbols('x,y,z')
+    expr = Matrix([[x, x+y, 3]])
+    name_expr = ("test", expr)
+    result = codegen(name_expr, "Octave", "test", header=False, empty=False)
+    assert result[0][0] == "test.m"
+    source = result[0][1]
+    expected = (
+        "function out1 = test(x, y, z)\n"
+        "  out1 = [x x + y 3];\n"
+        "end\n"
+    )
+    assert source == expected
 
 
 @XFAIL

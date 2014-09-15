@@ -54,7 +54,7 @@ class Assignment(C.Relational):
     rel_op = ':='
     __slots__ = []
 
-    def __new__(cls, lhs, rhs=0, **assumptions):
+    def __new__(cls, lhs, rhs=0, assign_loose=False, **assumptions):
         lhs = _sympify(lhs)
         rhs = _sympify(rhs)
         # Tuple of things that can be on the lhs of an assignment
@@ -72,9 +72,8 @@ class Assignment(C.Relational):
                 raise ValueError("Cannot assign a scalar to a matrix.")
             elif lhs.shape != rhs.shape:
                 raise ValueError("Dimensions of lhs and rhs don't align.")
-        elif rhs_is_mat and not lhs_is_mat:
-            print("FIXME: temporarily disabled assign-matrix-to-scale error")
-            #raise ValueError("Cannot assign a matrix to a scalar.")
+        elif not assign_loose and rhs_is_mat and not lhs_is_mat:
+            raise ValueError("Cannot assign a matrix to a scalar.")
         return C.Relational.__new__(cls, lhs, rhs, **assumptions)
 
 
@@ -89,7 +88,7 @@ class CodePrinter(StrPrinter):
         'not': '!',
     }
 
-    def doprint(self, expr, assign_to=None):
+    def doprint(self, expr, assign_to=None, assign_loose=False):
         """
         Print the expression as code.
 
@@ -101,6 +100,9 @@ class CodePrinter(StrPrinter):
         assign_to : Symbol, MatrixSymbol, or string (optional)
             If provided, the printed code will set the expression to a
             variable with name ``assign_to``.
+
+        assign_loose : True/False, if ``assign_to`` is a string, then allow
+            assignment of either a Matrix or a scalar to that name.
         """
 
         if isinstance(assign_to, string_types):
@@ -108,9 +110,12 @@ class CodePrinter(StrPrinter):
         elif not isinstance(assign_to, (C.Basic, type(None))):
             raise TypeError("{0} cannot assign to object of type {1}".format(
                     type(self).__name__, type(assign_to)))
+        # FIXME: we might want to use this only for string inputs
+        #else:
+        #    assert not assign_loose
 
         if assign_to:
-            expr = Assignment(assign_to, expr)
+            expr = Assignment(assign_to, expr, assign_loose)
         else:
             expr = _sympify(expr)
 
