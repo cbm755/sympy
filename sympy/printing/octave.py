@@ -400,7 +400,6 @@ def octave_code(expr, assign_to=None, **settings):
         Setting contract=False will not generate loops, instead the user is
         responsible to provide values for the indices in the code.
         [default=True].
-        [FIXME: these are untested]
 
     Examples
     ========
@@ -511,7 +510,19 @@ def octave_code(expr, assign_to=None, **settings):
     >>> octave_code(f(x) + g(x) + g(mat), user_functions=custom_functions)
     'existing_octave_fcn(x) + my_fcn(x) + my_mat_fcn([1 x])'
 
-    [FIXME: test loops with ``Indexed`` types and add here, see ``ccode``]
+    Support for loops is provided through ``Indexed`` types. With
+    ``contract=True`` these expressions will be turned into loops, whereas
+    ``contract=False`` will just print the assignment expression that should be
+    looped over:
+    >>> from sympy import Eq, IndexedBase, Idx, ccode
+    >>> len_y = 5
+    >>> y = IndexedBase('y', shape=(len_y,))
+    >>> t = IndexedBase('t', shape=(len_y,))
+    >>> Dy = IndexedBase('Dy', shape=(len_y-1,))
+    >>> i = Idx('i', len_y-1)
+    >>> e = Eq(Dy[i], (y[i+1]-y[i])/(t[i+1]-t[i]))
+    >>> octave_code(e.rhs, assign_to=e.lhs, contract=False)
+    'Dy(i) = (y(i + 1) - y(i))./(t(i + 1) - t(i));'
     """
     return OctaveCodePrinter(settings).doprint(expr, assign_to,
                                                assign_loose=True)
