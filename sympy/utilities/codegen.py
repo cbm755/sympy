@@ -117,7 +117,8 @@ class Routine(object):
        values are possible in Python, but not in C or Fortran. Another example:
        Fortran and Python support complex numbers, while C does not.
     """
-    def __init__(self, name, expr, argument_sequence=None):
+    def __init__(self, name, expr, argument_sequence=None,
+                 matrix_can_be_single_symbol=False):
         """Initialize a Routine instance.
 
         ``name``
@@ -186,7 +187,8 @@ class Routine(object):
 
                 # avoid duplicate arguments
                 symbols.remove(symbol)
-            elif isinstance(expr, ImmutableMatrix):
+            elif (isinstance(expr, ImmutableMatrix)
+                  and not matrix_can_be_single_symbol):
                 # Create a "dummy" MatrixSymbol to use as the Output arg
                 out_arg = MatrixSymbol('out_%s' % abs(hash(expr)), *expr.shape)
                 dims = tuple([(S.Zero, dim - 1) for dim in out_arg.shape])
@@ -425,9 +427,10 @@ class Result(ResultBase):
            be guessed based on the assumptions on the expression argument.
         """
         # FIXME: for Octave, allow Matrices here, maybe breaks C/Fortran?
-        #if not isinstance(expr, (Expr, MatrixBase, ImmutableMatrix)):
-        if not isinstance(expr, Expr):
-            print(expr)
+        # Alternative if to subclass Result as MatrixResult.  I've tested
+        # both, neither very satifying.
+        #if not isinstance(expr, Expr):
+        if not isinstance(expr, (Expr, MatrixBase, ImmutableMatrix)):
             raise TypeError("The first argument must be a sympy expression.")
 
         temp_var = Variable(Symbol('result_%s' % abs(hash(expr))),
@@ -445,6 +448,8 @@ class Result(ResultBase):
 
 class CodeGen(object):
     """Abstract class for the code generators."""
+
+    ok_mat_to_scalar = False
 
     def __init__(self, project="project"):
         """Initialize a code generator.
@@ -950,6 +955,8 @@ class OctaveCodeGen(CodeGen):
     code_extension = "m"
     interface_extension = "h_FIXME"
 
+    ok_mat_to_scalar = True
+
     # FIXME: remove here and from FCodeGen?
     #def __init__(self, project='project'):
     #    CodeGen.__init__(self, project)
@@ -1176,8 +1183,10 @@ def codegen(
         # single tuple is given, turn it into a singleton list with a tuple.
         name_expr = [name_expr]
 
+    w = code_gen.ok_mat_to_scalar
+
     for name, expr in name_expr:
-        routines.append(Routine(name, expr, argument_sequence))
+        routines.append(Routine(name, expr, argument_sequence, matrix_can_be_single_symbol=w))
 
     # Write the code.
     return code_gen.write(routines, prefix, to_files, header, empty)

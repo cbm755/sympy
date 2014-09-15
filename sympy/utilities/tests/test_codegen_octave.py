@@ -272,24 +272,21 @@ def test_m_matrix_named_matsym():
     assert source == expected
 
 
-@XFAIL
 def test_m_matrix_output_autoname():
-    #FIXME: codegen gives weird name and works componentwise
+    # See "matrix_can_be_single_symbol" hack
     expr = Matrix([[x, x+y, 3]])
     name_expr = ("test", expr)
     result, = codegen(name_expr, "Octave", "test", header=False, empty=False)
     source = result[1]
     expected = (
-        "function out1 = test(x, y, z)\n"
+        "function out1 = test(x, y)\n"
         "  out1 = [x x + y 3];\n"
         "end\n"
     )
     assert source == expected
 
 
-@XFAIL
-def test_m_matrix_named_ordered_BROKEN():
-    #FIXME: codegen wants to do component-wise stuff here, we must stop it
+def test_m_matrix_output_autoname_2():
     e1 = (x + y)
     e2 = Matrix([[2*x, 2*y, 2*z]])
     e3 = Matrix([[x], [y], [z]])
@@ -303,8 +300,30 @@ def test_m_matrix_named_ordered_BROKEN():
         "  out1 = x + y;\n"
         "  out2 = [2*x 2*y 2*z];\n"
         "  out3 = [x; y; z];\n"
-        "  out4 = [x y; ...\n"
-        "z 16];\n"
+        "  out4 = [x  y; ...\n"
+        "  z 16];\n"
+        "end\n"
+    )
+    assert source == expected
+
+
+@XFAIL
+def test_m_results_named_ordered():
+    # does component-by-component
+    B, C = symbols('B,C')
+    A = MatrixSymbol('A', 1, 3)
+    expr1 = Equality(C, (x + y)*z)
+    expr2 = Equality(A, Matrix([[1, 2, x]]))
+    expr3 = Equality(B, 2*x)
+    name_expr = ("test", [expr1, expr2, expr3])
+    result, = codegen(name_expr, "Octave", "test", header=False, empty=False,
+                     argument_sequence=(x, z, y, C, A, B))
+    source = result[1]
+    expected = (
+        "function [C, A, B] = test(x, z, y)\n"
+        "  C = z.*(x + y);\n"
+        "  A = [1 2 x];\n"
+        "  B = 2*x;\n"
         "end\n"
     )
     assert source == expected
