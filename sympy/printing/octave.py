@@ -405,7 +405,7 @@ def octave_code(expr, assign_to=None, **settings):
     Examples
     ========
 
-    >>> from sympy import octave_code, symbols, sin
+    >>> from sympy import octave_code, symbols, sin, pi
     >>> x = symbols('x')
     >>> octave_code(sin(x).series(x).removeO())
     'x.^5/120 - x.^3/6 + x'
@@ -429,7 +429,7 @@ def octave_code(expr, assign_to=None, **settings):
     >>> n = Symbol('n', integer=True, positive=True)
     >>> A = MatrixSymbol('A', n, n)
     >>> octave_code(3*pi*A**3)
-    '(3*pi)*A^3
+    '(3*pi)*A^3'
 
     Unfortunately, there is currently there is no easy way to specify scalar
     symbols (other than 1x1 Matrix), so sometimes the code might have some
@@ -437,7 +437,7 @@ def octave_code(expr, assign_to=None, **settings):
     and a human being might write "(x^2*y)*A^3":
 
     >>> octave_code(x**2*y*A**3)
-    '(x.^2.*y)*A^3
+    '(x.^2.*y)*A^3'
 
     Matrices are supported.  They can be assigned to a string using
     ``assign_to`` or to a ``MatrixSymbol``.  The latter must have the same
@@ -453,7 +453,7 @@ def octave_code(expr, assign_to=None, **settings):
     Contrast this with:
 
     >>> A = MatrixSymbol('A', 2, 2)
-    >>> print(octave_code(mat, A))
+    >>> print(octave_code(mat, assign_to=A))
     A(1, 1) = x.^2;
     A(2, 1) = x.*y;
     A(1, 2) = sin(x);
@@ -485,7 +485,7 @@ def octave_code(expr, assign_to=None, **settings):
     >>> octave_code(mat, assign_to='A')
     'A = [x.^2 ((x > 0).*(x + 1) + (~(x > 0)).*(x)) sin(x)];'
     >>> A = MatrixSymbol('A', 1, 3)
-    >>> print(octave_code(pw, assign_to=A))
+    >>> print(octave_code(mat, assign_to=A))
     A(1, 1) = x.^2;
     if (x > 0)
       A(1, 2) = x + 1;
@@ -499,6 +499,7 @@ def octave_code(expr, assign_to=None, **settings):
     dictionary value can be a list of tuples i.e., [(argument_test,
     cfunction_string)].  This can be used to call a custom Octave function.
 
+    >>> from sympy import Function
     >>> f = Function('f')
     >>> g = Function('g')
     >>> custom_functions = {
@@ -513,7 +514,7 @@ def octave_code(expr, assign_to=None, **settings):
     [FIXME: test loops with ``Indexed`` types and add here, see ``ccode``]
     """
     return OctaveCodePrinter(settings).doprint(expr, assign_to,
-                             assign_loose=True)
+                                               assign_loose=True)
 
 
 def print_octave_code(expr, **settings):
