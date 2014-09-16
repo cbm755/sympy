@@ -25,8 +25,6 @@ class StrPrinter(Printer):
 
     _relationals = dict()
 
-    _exponentsymbol = "**"
-
     def parenthesize(self, item, level):
         if precedence(item) <= level:
             return "(%s)" % self._print(item)
@@ -494,13 +492,12 @@ class StrPrinter(Printer):
             # but just check to be sure.
             if e.startswith('(Rational'):
                 return '%s**%s' % (self.parenthesize(expr.base, PREC), e[1:-1])
-        return '%s%s%s' % (self.parenthesize(expr.base, PREC), self._exponentsymbol, e)
+        return '%s**%s' % (self.parenthesize(expr.base, PREC), e)
 
     def _print_MatPow(self, expr):
         PREC = precedence(expr)
-        return '%s%s%s' % (self.parenthesize(expr.base, PREC),
-                           self._exponentsymbol,
-                           self.parenthesize(expr.exp, PREC))
+        return '%s**%s' % (self.parenthesize(expr.base, PREC),
+                         self.parenthesize(expr.exp, PREC))
 
     def _print_Integer(self, expr):
         return str(expr.p)
