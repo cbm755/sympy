@@ -85,7 +85,6 @@ class OctaveCodePrinter(CodePrinter):
 
     def _traverse_matrix_indices(self, mat):
         # Octave uses Fortran order (column-major)
-        # FIXME: need tests for matrix traverse stuff
         rows, cols = mat.shape
         return ((i, j) for j in range(cols) for i in range(rows))
 
@@ -414,6 +413,8 @@ def octave_code(expr, assign_to=None, **settings):
     >>> octave_code(3*pi*A**3)
     '(3*pi)*A^3'
 
+    This class uses several rules to decide which symbol to use a product.
+    Pure numbers use "*", Symbols use ".*" and MatrixSymbols use "*".
     Unfortunately, there is currently there is no easy way to specify scalar
     symbols (other than 1x1 Matrix), so sometimes the code might have some
     minor cosmetic issues.  For example, here presumably x and y are scalars
@@ -426,6 +427,10 @@ def octave_code(expr, assign_to=None, **settings):
     ``assign_to`` or to a ``MatrixSymbol``.  The latter must have the same
     dimensions.
     [FIXME: currently can also be assigned to a ``Symbol``.]
+
+    FIXME: Hadamard products print with ".*" as well so if do need more careful
+    control than the above, you could work solely with MatrixSymbols, using
+    matrix and Hadamard products.
 
     >>> from sympy import Matrix, MatrixSymbol
     >>> mat = Matrix([[x**2, sin(x)], [x*y, ceiling(x)]])
