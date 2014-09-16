@@ -252,7 +252,7 @@ class OctaveCodePrinter(CodePrinter):
             return "[%s]" % A.table(self, rowstart='', rowend='',
                                     rowsep='; ', colsep=' ')
         return "[%s]" % A.table(self, rowstart='', rowend='',
-                                rowsep='; ...\n', colsep=' ')
+                                rowsep=';\n', colsep=' ')
     # FIXME: see my prosposed change for _print_NumberSymbol, same here
     _print_SparseMatrix = \
         _print_MutableSparseMatrix = \
@@ -435,7 +435,7 @@ def octave_code(expr, assign_to=None, **settings):
     >>> from sympy import Matrix, MatrixSymbol
     >>> mat = Matrix([[x**2, sin(x)], [x*y, ceiling(x)]])
     >>> print(octave_code(mat, assign_to='A'))
-    A = [x.^2  sin(x); ...
+    A = [x.^2  sin(x);
     x.*y ceil(x)];
 
     Contrast this with:
