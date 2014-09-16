@@ -25,6 +25,8 @@ class StrPrinter(Printer):
 
     _relationals = dict()
 
+    _exponentsymbol = "**"
+
     def parenthesize(self, item, level):
         if precedence(item) <= level:
             return "(%s)" % self._print(item)
