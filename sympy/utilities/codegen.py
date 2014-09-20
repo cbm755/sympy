@@ -953,13 +953,8 @@ class OctaveCodeGen(CodeGen):
     """
 
     code_extension = "m"
-    interface_extension = "h_FIXME"
 
     ok_mat_to_scalar = True
-
-    # FIXME: remove here and from FCodeGen?
-    #def __init__(self, project='project'):
-    #    CodeGen.__init__(self, project)
 
     def _get_symbol(self, s):
         """returns the symbol as fcode print it"""

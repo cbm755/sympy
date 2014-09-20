@@ -545,8 +545,7 @@ def octave_code(expr, assign_to=None, **settings):
     >>> octave_code(e.rhs, assign_to=e.lhs, contract=False)
     'Dy(i) = (y(i + 1) - y(i))./(t(i + 1) - t(i));'
     """
-    return OctaveCodePrinter(settings).doprint(expr, assign_to,
-                                               assign_loose=True)
+    return OctaveCodePrinter(settings).doprint(expr, assign_to)
 
 
 def print_octave_code(expr, **settings):

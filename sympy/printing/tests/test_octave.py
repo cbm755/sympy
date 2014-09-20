@@ -249,11 +249,22 @@ def test_octave_matrix_assign_to():
 @XFAIL
 def test_octave_matrix_assign_to_more():
     # assigning to Symbol or MatrixSymbol requires lhs/rhs match
-    # FIXME: do we want this?  currently this is allowed
+    A = Matrix([[1, 2, 3]])
     B = MatrixSymbol('B', 1, 3)
-    #print(mcode(A, assign_to=B))
+    C = MatrixSymbol('C', 2, 3)
     assert mcode(A, assign_to=B) == "B = [1 2 3];"
     raises(ValueError, lambda: mcode(A, assign_to=x))
+    raises(ValueError, lambda: mcode(A, assign_to=C))
+
+
+@XFAIL
+def test_octave_matrix_1x1():
+    A = Matrix([[3]])
+    B = MatrixSymbol('B', 1, 1)
+    C = MatrixSymbol('C', 1, 2)
+    assert mcode(A, assign_to=B) == "B = 3;"
+    assert mcode(A, assign_to=x) == "x = 3;"
+    raises(ValueError, lambda: mcode(A, assign_to=C))
 
 
 def test_octave_matrix_elements():

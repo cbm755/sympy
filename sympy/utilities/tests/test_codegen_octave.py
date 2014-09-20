@@ -242,10 +242,12 @@ def test_m_filename_match_first_fcn():
                         "Octave", "bar", header=False, empty=False))
 
 
+# FIXME: use Assignment directly to test string name?  easy way for user to name cpdegen outputs without MatrixSymbol?
+
+
 def test_m_matrix_named():
-    # FIXME: myout1 should be MatrixSymbol?  Well maybe we want this to work too.
     e2 = Matrix([[x, 2*y, pi*z]])
-    name_expr = ("test", Equality(S('myout1'), e2, evaluate=False))
+    name_expr = ("test", Equality(MatrixSymbol('myout1', 1, 3), e2))
     result = codegen(name_expr, "Octave", "test", header=False, empty=False)
     assert result[0][0] == "test.m"
     source = result[0][1]
