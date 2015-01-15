@@ -667,9 +667,19 @@ def auto_number(tokens, local_dict, global_dict):
                         (OP, ')'),
                     ]
                 else:
+                    # Find the precision, but make sure we use a least 15.
+                    # Note: perhaps a bit heavy to make the float just to
+                    # extract the precision and discard, could instead
+                    # use some heuristic such as the string length.
+                    from sympy import Float
+                    from mpmath.libmp import prec_to_dps
+                    tmp = Float(str(number), '')
+                    dps = max(15, prec_to_dps(tmp._prec))
                     seq = [(NAME, 'Float'), (OP, '('),
                            (NUMBER, repr(str(number))),
-                           (OP, ','), (STRING, '""'), (OP, ')')]
+                           #(OP, ','), (NUMBER, '%s' % dps),
+                           (OP, ','), (STRING, 'prec=%s' % dps),
+                           (OP, ')')]
             else:
                 seq = [(NAME, 'Integer'), (OP, '('), (
                     NUMBER, number), (OP, ')')]
@@ -683,17 +693,33 @@ def auto_number(tokens, local_dict, global_dict):
 
 def rationalize(tokens, local_dict, global_dict):
     """Converts floats into ``Rational``. Run AFTER ``auto_number``."""
+    # Floats we can deal with:
+    #     Float('1.23')
+    #     Float('1.23', 'prec=15')
+    #     Float('1.23', '15')
+    # Convert each to either Rational('1.23') or Rational('1.23',)
     result = []
     passed_float = False
     for toknum, tokval in tokens:
         if toknum == NAME:
             if tokval == 'Float':
                 passed_float = True
+                passed_1st_arg = False
                 tokval = 'Rational'
             result.append((toknum, tokval))
-        elif passed_float == True and toknum == NUMBER:
-            passed_float = False
+        elif passed_float and not passed_1st_arg and toknum == NUMBER:
+            passed_1st_arg = True
             result.append((STRING, tokval))
+        elif passed_float and passed_1st_arg and toknum == STRING:
+            # omit the "prec=15" bit
+            passed_float = False
+        elif passed_float and passed_1st_arg and toknum == NUMBER:
+            # omit the "15" bit
+            passed_float = False
+        elif passed_float and passed_1st_arg and toknum == OP and tokval == ')':
+            # had no precision, so we're done
+            passed_float = False
+            result.append((toknum, tokval))
         else:
             result.append((toknum, tokval))
 
