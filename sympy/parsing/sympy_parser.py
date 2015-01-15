@@ -668,7 +668,8 @@ def auto_number(tokens, local_dict, global_dict):
                     ]
                 else:
                     seq = [(NAME, 'Float'), (OP, '('),
-                           (NUMBER, repr(str(number))), (OP, ')')]
+                           (NUMBER, repr(str(number))),
+                           (OP, ','), (STRING, '""'), (OP, ')')]
             else:
                 seq = [(NAME, 'Integer'), (OP, '('), (
                     NUMBER, number), (OP, ')')]
