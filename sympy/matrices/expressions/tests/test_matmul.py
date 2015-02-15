@@ -2,7 +2,7 @@ from sympy.core import I, symbols, Basic
 from sympy.functions import adjoint, transpose
 from sympy.matrices import (Identity, Inverse, Matrix, MatrixSymbol, ZeroMatrix,
         eye, ImmutableMatrix)
-from sympy.matrices.expressions import Adjoint, Transpose, det
+from sympy.matrices.expressions import Adjoint, Transpose, det, MatPow
 from sympy.matrices.expressions.matmul import (factor_in_front, remove_ids,
         MatMul, xxinv, any_zeros, unpack, only_squares)
 from sympy.strategies import null_safe
@@ -89,6 +89,17 @@ def test_doit():
     assert MatMul(C, 2, D).doit().args == (2, C, D)
     assert MatMul(C, Transpose(D*C)).args == (C, Transpose(D*C))
     assert MatMul(C, Transpose(D*C)).doit(deep=True).args == (C, C.T, D.T)
+
+
+def test_doit_args_MatrixExpr():
+    # FIXME: should we really need deep=True?
+    X = ImmutableMatrix([[1, 2], [3, 4]])
+    Y = ImmutableMatrix([[2, 3], [4, 5]])
+    q = MatMul(X, MatPow(Y, 2))
+    #pprint(q)
+    #pprint(q.doit())
+    #pprint(q.doit(deep=True))
+    assert q.doit(deep=True) == X*Y**2
 
 
 def test_matmul_sympify():
