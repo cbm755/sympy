@@ -529,9 +529,9 @@ def lambdify(args, expr, modules=None, printer=None, use_imps=True,
     >>> f = lambdify((x, y), sin(x*y)**2)
     >>> f(0, 5)
     0.0
-    >>> row = lambdify((x, y), Matrix((x, x + y)).T, modules='sympy')
+    >>> row = lambdify((x, y), Matrix((x, x + y)).T)
     >>> row(1, 2)
-    Matrix([[1, 3]])
+    array([[1, 3]])
 
     ``lambdify`` can be used to translate SymPy expressions into mpmath
     functions. This may be preferable to using ``evalf`` (which uses mpmath on
