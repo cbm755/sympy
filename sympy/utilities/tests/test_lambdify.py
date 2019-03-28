@@ -666,9 +666,9 @@ def test_namespace_order():
           'g': lambda x: 'function g'}
     f = sympy.Function('f')
     g = sympy.Function('g')
-    if1 = lambdify(x, f(x), modules=(n1, "sympy"))
+    if1 = lambdify(x, f(x), modules=(n1, "mpmath"))
     assert if1(1) == 'first f'
-    if2 = lambdify(x, g(x), modules=(n2, "sympy"))
+    if2 = lambdify(x, g(x), modules=(n2, "mpmath"))
     # previously gave 'second f'
     assert if1(1) == 'first f'
 
@@ -1061,15 +1061,15 @@ def test_issue_14941():
     x, y = Dummy(), Dummy()
 
     # test dict
-    f1 = lambdify([x, y], {x: 3, y: 3}, 'sympy')
+    f1 = lambdify([x, y], {x: 3, y: 3})
     assert f1(2, 3) == {2: 3, 3: 3}
 
     # test tuple
-    f2 = lambdify([x, y], (y, x), 'sympy')
+    f2 = lambdify([x, y], (y, x))
     assert f2(2, 3) == (3, 2)
 
     # test list
-    f3 = lambdify([x, y], [y, x], 'sympy')
+    f3 = lambdify([x, y], [y, x])
     assert f3(2, 3) == [3, 2]
 
 
