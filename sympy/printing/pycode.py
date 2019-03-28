@@ -732,16 +732,3 @@ for k in SciPyPrinter._kf:
 
 for k in SciPyPrinter._kc:
     setattr(SciPyPrinter, '_print_%s' % k, _print_known_const)
-
-
-class SymPyPrinter(PythonCodePrinter):
-
-    _kf = {k: 'sympy.' + v for k, v in chain(
-        _known_functions.items(),
-        _known_functions_math.items()
-    )}
-
-    def _print_Function(self, expr):
-        mod = expr.func.__module__ or ''
-        return '%s(%s)' % (self._module_format(mod + ('.' if mod else '') + expr.func.__name__),
-                           ', '.join(map(lambda arg: self._print(arg), expr.args)))
