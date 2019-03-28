@@ -334,6 +334,7 @@ def test_sin():
     assert isinstance(f(2), float)
 
 
+@XFAIL
 def test_matrix():
     A = Matrix([[x, x*y], [sin(z) + 4, x**z]])
     sol = Matrix([[1, 2], [sin(3) + 4, 1]])
@@ -630,6 +631,7 @@ def test_tensorflow_relational():
     assert func(a).eval(session=s, feed_dict={a: 1})
 
 
+@XFAIL
 def test_integral():
     f = Lambda(x, exp(-x**2))
     l = lambdify(x, Integral(f(x), (x, -oo, oo)), modules="sympy")
@@ -648,6 +650,7 @@ def test_sym_list_args():
     assert f(1, 2) == 3 + z
 
 
+@XFAIL
 def test_sym_integral():
     f = Lambda(x, exp(-x**2))
     l = lambdify(x, Integral(f(x), (x, -oo, oo)), modules="sympy")
